@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TADCU — Episode 5: The Fair</title>
+<style>
+/* ============================================================
+   TADCU — Episode 5 "The Fair"
+   Production rules unchanged (see Episodes 1-4):
+   - CSS animations only on elements WITHOUT transform attrs;
+     outer <g> position, inner <g> motion; symbols in <defs>;
+     nothing animated inside <use> shadow trees.
+   ============================================================ */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --cream:#f7e9d7; --slate:#5b6670; --brick:#b04a3a;
+  --sheep:#f2ead8; --charcoal:#3a3733; --ink:#2c2a27;
+  --gold:#d4a017;
+}
+
+html,body { height:100%; background:#191d1a; font-family:"Trebuchet MS",Verdana,sans-serif; }
+#theatre { height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; }
+#stage { position:relative; width:min(100%,1600px); aspect-ratio:16/9; background:#20301f; border-radius:14px; overflow:hidden; box-shadow:0 18px 50px rgba(0,0,0,.55); }
+.panel { position:absolute; inset:0; opacity:0; visibility:hidden; }
+.panel.active { opacity:1; visibility:visible; }
+#stage.paused * { animation-play-state:paused !important; }
+svg { display:block; width:100%; height:100%; }
+
+/* ---------- bubbles ---------- */
+.bubble {
+  position:absolute; max-width:34%; background:#fffdf6; color:var(--ink);
+  border:3px solid var(--ink); border-radius:16px; padding:10px 14px;
+  font-family:"Comic Sans MS","Segoe Print","Bradley Hand",cursive;
+  font-size:clamp(10px,1.35vw,21px); line-height:1.25; z-index:6; opacity:0;
+  animation:bubbleShow var(--dur,4s) ease var(--d,0s) both;
+  box-shadow:3px 4px 0 rgba(0,0,0,.18);
+}
+.bubble::after { content:""; position:absolute; left:22%; bottom:-14px; border:7px solid transparent; border-top-color:var(--ink); }
+.bubble i { opacity:.6; font-size:.85em; }
+@keyframes bubbleShow {
+  0%   { opacity:0; transform:scale(.5); }
+  8%   { opacity:1; transform:scale(1.06); }
+  13%  { transform:scale(1); }
+  86%  { opacity:1; transform:scale(1); }
+  100% { opacity:0; transform:scale(.92); }
+}
+
+/* ---------- scenery ---------- */
+.bunting-flag { }
+.swayBunt { animation:swayBunt 3.2s ease-in-out infinite alternate; transform-origin:top center; }
+@keyframes swayBunt { from{transform:rotate(-2.5deg);} to{transform:rotate(2.5deg);} }
+
+.curl { animation:curl 5s linear infinite; opacity:0; }
+.curl.b{ animation-delay:-1.7s; } .curl.c{ animation-delay:-3.4s; }
+@keyframes curl {
+  0%{ transform:translate(0,0) scale(.4); opacity:0; }
+  18%{ opacity:.8; }
+  100%{ transform:translate(20px,-80px) scale(1.4); opacity:0; }
+}
+
+.bob   { animation:bob .7s ease-in-out infinite alternate; }
+.bob.b { animation-delay:-.25s; } .bob.c{ animation-delay:-.5s; } .bob.d{ animation-delay:-.12s; }
+@keyframes bob { from{transform:translateY(0);} to{transform:translateY(-9px);} }
+.hopHi { animation:hopHi .45s ease-in-out infinite alternate; }
+.hopHi.b{ animation-delay:-.2s; } .hopHi.c{ animation-delay:-.35s; }
+@keyframes hopHi  { from{transform:translateY(0);} to{transform:translateY(-24px);} }
+
+.wag  { animation:wag .5s ease-in-out infinite alternate; transform-origin:10px 34px; }
+@keyframes wag { from{transform:rotate(-16deg);} to{transform:rotate(18deg);} }
+.earPerk { animation:earPerk .7s ease var(--d,0s) both; transform-origin:96px 20px; }
+@keyframes earPerk { 0%,40%{transform:rotate(0);} 60%{transform:rotate(-13deg);} 100%{transform:rotate(0);} }
+
+.strollIn { animation:strollIn 5.5s ease-in-out .6s both; }
+@keyframes strollIn { from{transform:translate(-240px,540px) scale(1.15);} to{transform:translate(300px,540px) scale(1.15);} }
+.walkL { animation:walkL var(--dur,8s) linear var(--d,0s) both; }
+@keyframes walkL { from{transform:translateX(0);} to{transform:translateX(var(--dx,-1200px));} }
+.strutR { animation:strutR var(--dur,9s) linear var(--d,0s) both; }
+@keyframes strutR {
+  0% { transform:translateX(0); }
+  55% { transform:translateX(calc(var(--dx,260px) * .92)); }
+  70% { transform:translateX(var(--dx,260px)); }
+  100% { transform:translateX(var(--dx,260px)); }
+}
+
+.tadBob { animation:tadBob .55s ease-in-out infinite alternate; }
+@keyframes tadBob { from{transform:translateY(0) rotate(0deg);} to{transform:translateY(-7px) rotate(-2deg);} }
+.capTip { animation:capTip 4s ease 1s both; transform-origin:96px 40px; }
+@keyframes capTip { 0%,30%{transform:rotate(0);} 45%{transform:rotate(-8deg) translateY(-3px);} 60%,100%{transform:rotate(0);} }
+
+.chew { animation:chew 2.6s ease-in-out var(--d,0s) both; transform-origin:86px 30px; }
+@keyframes chew {
+  0%,24%   { transform:rotate(0); }
+  34%,46%  { transform:rotate(-7deg); }
+  52%,64%  { transform:rotate(0); }
+  70%,82%  { transform:rotate(-5deg); }
+  90%,100% { transform:rotate(0); }
+}
+
+/* ---------- cards ---------- */
+.t-main { font-family:"Comic Sans MS","Segoe Print",cursive; font-weight:700; fill:var(--cream); letter-spacing:.06em; }
+.rise { animation:rise 1.5s cubic-bezier(.2,1.35,.4,1) var(--d,0s) both; }
+@keyframes rise { from{opacity:0; transform:translateY(70px);} to{opacity:1; transform:translateY(0);} }
+.pop  { animation:pop 1s cubic-bezier(.2,1.6,.4,1) var(--d,0s) both; }
+@keyframes pop { from{opacity:0; transform:scale(.3);} to{opacity:1; transform:scale(1);} }
+
+/* ---------- subtitle & controls ---------- */
+#subBar { position:absolute; left:4%; right:4%; bottom:8.5%; z-index:8; text-align:center; pointer-events:none; }
+#sub { display:inline-block; max-width:88%; background:rgba(18,22,18,.85); color:#fff; padding:8px 16px; border-radius:10px; font-size:clamp(11px,1.6vw,22px); line-height:1.3; font-family:"Comic Sans MS","Segoe Print",cursive; }
+#sub:empty { opacity:0; }
+#sub .who { color:#ffd28a; font-weight:700; margin-right:.45em; text-transform:uppercase; font-size:.78em; letter-spacing:.1em; }
+#ui { width:min(100%,1600px); margin-top:10px; display:grid; grid-template-columns:auto auto 1fr auto auto; gap:10px; align-items:center; color:#cfd8cf; font-size:13px; }
+#ui button { background:#2c342c; color:#e8eee6; border:1px solid #465046; border-radius:8px; width:46px; height:34px; cursor:pointer; font-size:14px; }
+#ui button:hover { background:#39503a; }
+#bar { height:10px; background:#2c342c; border-radius:6px; overflow:hidden; cursor:pointer; }
+#fill { height:100%; width:0%; background:linear-gradient(90deg,#67a568,#b04a3a); }
+#lbl { min-width:250px; text-align:right; opacity:.85; white-space:nowrap; }
+#hint { color:#9aa79a; font-size:12px; margin-top:6px; }
+</style>
+</head>
+<body>
+<div id="theatre">
+  <div id="stage">
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <g id="sheep-shape">
+          <rect x="24" y="42" width="7" height="20" rx="3" fill="#3a3733"/>
+          <rect x="36" y="44" width="7" height="18" rx="3" fill="#3a3733"/>
+          <rect x="60" y="44" width="7" height="18" rx="3" fill="#3a3733"/>
+          <rect x="71" y="42" width="7" height="20" rx="3" fill="#3a3733"/>
+          <ellipse cx="51" cy="33" rx="33" ry="18" fill="#f2ead8"/>
+          <circle cx="26" cy="22" r="9" fill="#f2ead8"/><circle cx="42" cy="16" r="10" fill="#f2ead8"/>
+          <circle cx="58" cy="16" r="10" fill="#f2ead8"/><circle cx="74" cy="22" r="9" fill="#f2ead8"/>
+          <ellipse cx="86" cy="26" rx="10" ry="8.5" fill="#3a3733"/>
+          <path d="M80 18 q-7 -8 -12 -2" stroke="#3a3733" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="89" cy="24" r="2.1" fill="#fff"/><circle cx="89" cy="24" r="1" fill="#000"/>
+          <circle cx="17" cy="27" r="4.5" fill="#e4dccb"/>
+        </g>
+        <g id="sheep-dott">
+          <rect x="24" y="42" width="7" height="20" rx="3" fill="#3a3733"/>
+          <rect x="36" y="44" width="7" height="18" rx="3" fill="#3a3733"/>
+          <rect x="60" y="44" width="7" height="18" rx="3" fill="#3a3733"/>
+          <rect x="71" y="42" width="7" height="20" rx="3" fill="#3a3733"/>
+          <ellipse cx="51" cy="33" rx="33" ry="18" fill="#f2ead8"/>
+          <circle cx="36" cy="30" r="6" fill="#3a3733" opacity=".8"/>
+          <circle cx="60" cy="40" r="5" fill="#3a3733" opacity=".8"/>
+          <circle cx="70" cy="24" r="4.5" fill="#3a3733" opacity=".8"/>
+          <circle cx="44" cy="20" r="5" fill="#3a3733" opacity=".8"/>
+          <ellipse cx="86" cy="26" rx="10" ry="8.5" fill="#3a3733"/>
+          <path d="M80 18 q-7 -8 -12 -2" stroke="#3a3733" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="89" cy="24" r="2.1" fill="#fff"/><circle cx="89" cy="24" r="1" fill="#000"/>
+        </g>
+
+        <g id="tadcu">
+          <rect x="46" y="150" width="13" height="40" rx="5" fill="#5b6670"/>
+          <rect x="67" y="150" width="13" height="40" rx="5" fill="#5b6670"/>
+          <ellipse cx="50" cy="192" rx="12" ry="7" fill="#2c2a27"/>
+          <ellipse cx="77" cy="192" rx="12" ry="7" fill="#2c2a27"/>
+          <path d="M35 72 q0 -28 30 -28 q30 0 30 28 v82 q0 10 -12 10 h-36 q-12 0 -12 -10 z" fill="#b04a3a"/>
+          <rect x="48" y="106" width="34" height="9" rx="3" fill="#8d3a2d"/>
+          <circle cx="64" cy="126" r="4" fill="#8d3a2d"/><circle cx="64" cy="140" r="4" fill="#8d3a2d"/>
+          <path d="M38 84 q-18 22 -22 50" stroke="#c96a55" stroke-width="11" fill="none" stroke-linecap="round"/>
+          <path d="M18 136 l-22 48" stroke="#7a5230" stroke-width="7" stroke-linecap="round"/>
+          <circle cx="-5" cy="182" r="6" fill="#e9c39a"/>
+          <circle cx="98" cy="46" r="27" fill="#eebd93"/>
+          <path d="M72 44 q0 40 26 40 q26 0 26 -40 q-13 12 -26 12 q-13 0 -26 -12 z" fill="#d8d5d1"/>
+          <path d="M87 55 q11 -9 22 0 q-11 9 -22 0 z" fill="#e4e1de"/>
+          <circle cx="85" cy="47" r="3.4" fill="#2c2a27"/><circle cx="111" cy="47" r="3.4" fill="#2c2a27"/>
+          <path d="M96 48 l6 6 l-12 0 q0 6 3 8" stroke="#e5956f" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="76" cy="52" r="6" fill="#e5956f" opacity=".45"/>
+          <circle cx="120" cy="52" r="6" fill="#e5956f" opacity=".45"/>
+          <path d="M70 38 q0 -30 28 -30 q28 0 28 30 q-14 -9 -28 -9 q-14 0 -28 9 z" fill="#b04a3a"/>
+          <rect x="66" y="38" width="64" height="9" rx="4" fill="#8d3a2d"/>
+          <g>
+            <path d="M82 86 q22 18 28 32" stroke="#c96a55" stroke-width="11" fill="none" stroke-linecap="round"/>
+            <circle cx="111" cy="120" r="7" fill="#e9c39a"/>
+            <rect x="102" y="104" width="20" height="16" rx="3" fill="#e8e8e8"/>
+            <path d="M122 108 q9 4 0 10" stroke="#e8e8e8" stroke-width="4" fill="none"/>
+            <circle cx="112" cy="100" r="2.5" fill="#b8cfe2"/>
+          </g>
+        </g>
+
+        <g id="bryn">
+          <ellipse cx="54" cy="42" rx="36" ry="15" fill="#2c2a27"/>
+          <ellipse cx="48" cy="52" rx="18" ry="8" fill="#f2ead8"/>
+          <rect x="32" y="50" width="7" height="13" rx="3" fill="#2c2a27"/>
+          <rect x="46" y="52" width="7" height="11" rx="3" fill="#2c2a27"/>
+          <rect x="60" y="52" width="7" height="11" rx="3" fill="#2c2a27"/>
+          <rect x="70" y="50" width="7" height="13" rx="3" fill="#2c2a27"/>
+        </g>
+        <g id="bryn-tail">
+          <path d="M10 38 q-12 -2 -14 -14" stroke="#2c2a27" stroke-width="8" fill="none" stroke-linecap="round"/>
+        </g>
+        <g id="bryn-head">
+          <path d="M76 24 q13 -9 22 1 q7 8 3 17 q-4 9 -15 9 l-14 -2 z" fill="#2c2a27"/>
+          <path d="M80 28 q11 -5 15 4 q-9 9 -16 2 z" fill="#f2ead8"/>
+          <path d="M86 44 q5 6 13 4" stroke="#e58a97" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="91" cy="23" r="2.4" fill="#fff"/>
+          <path d="M95 13 l7 -12" stroke="#2c2a27" stroke-width="6" stroke-linecap="round"/>
+        </g>
+        <g id="bandana">
+          <path d="M78 34 L104 40 L80 48 z" fill="#b04a3a"/>
+          <path d="M78 34 q4 8 2 14" stroke="#8d3a2d" stroke-width="3" fill="none"/>
+        </g>
+
+        <!-- rosette -->
+        <g id="rosette">
+          <circle cx="0" cy="0" r="22" fill="#e05454"/>
+          <circle cx="0" cy="0" r="22" fill="none" stroke="#a02020" stroke-width="4"/>
+          <circle cx="0" cy="0" r="10" fill="#d4a017"/>
+          <path d="M-10 16 L-18 44 L-2 34 L10 46 L14 16z" fill="#e05454"/>
+        </g>
+
+        <!-- stall -->
+        <g id="stall">
+          <rect x="0" y="0" width="240" height="18" fill="#8d3a2d"/>
+          <rect x="10" y="18" width="16" height="120" fill="#a9803f"/>
+          <rect x="214" y="18" width="16" height="120" fill="#a9803f"/>
+          <rect x="0" y="76" width="240" height="10" fill="#a9803f"/>
+        </g>
+        <!-- bunting between two poles -->
+        <g id="bunting">
+          <path d="M0 0 q300 60 600 0" stroke="#7a5230" stroke-width="5" fill="none"/>
+          <path d="M40 12 l14 26 l14 -26z" fill="#b04a3a"/>
+          <path d="M120 22 l14 26 l14 -26z" fill="#5b8896"/>
+          <path d="M200 26 l14 26 l14 -26z" fill="#d4a017"/>
+          <path d="M280 24 l14 26 l14 -26z" fill="#b04a3a"/>
+          <path d="M360 16 l14 26 l14 -26z" fill="#5b8896"/>
+          <path d="M440 12 l14 26 l14 -26z" fill="#d4a017"/>
+          <path d="M520 14 l14 26 l14 -26z" fill="#b04a3a"/>
+        </g>
+        <!-- kettle return -->
+        <g id="kettle">
+          <path d="M0 46 q0 -34 34 -34 q34 0 34 34 q0 20 -34 20 q-34 0 -34 -20z" fill="#5b6670"/>
+          <path d="M62 22 q16 -8 18 -22" stroke="#5b6670" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <path d="M4 24 q-12 4 -12 18" stroke="#5b6670" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <rect x="22" y="0" width="24" height="10" rx="4" fill="#2c2a27"/>
+        </g>
+
+        <!-- Dilys the vet (also runs the tea stall) -->
+        <g id="dilys">
+          <rect x="46" y="150" width="12" height="42" rx="5" fill="#4f8476"/>
+          <rect x="66" y="150" width="12" height="42" rx="5" fill="#4f8476"/>
+          <ellipse cx="49" cy="194" rx="11" ry="7" fill="#2c2a27"/>
+          <ellipse cx="76" cy="194" rx="11" ry="7" fill="#2c2a27"/>
+          <path d="M36 76 q0 -26 29 -26 q29 0 29 26 v80 q0 10 -12 10 h-34 q-12 0 -12 -10 z" fill="#6fae9c"/>
+          <path d="M60 50 h30 l-4 10 h-22 z" fill="#e9f4ef"/>
+          <rect x="46" y="88" width="10" height="40" rx="4" fill="#4f8476"/>
+          <path d="M40 78 q-12 12 -14 30" stroke="#5f9d8d" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <circle cx="26" cy="110" r="6" fill="#eec7a3"/>
+          <path d="M38 62 q28 4 54 -4" stroke="#2c2a27" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <circle cx="42" cy="78" r="6" fill="#2c2a27"/>
+          <circle cx="97" cy="38" r="25" fill="#eec7a3"/>
+          <path d="M74 32 q0 -32 24 -32 q24 0 24 30 l0 22 q-2 -16 -20 -18 q-18 -2 -24 16 q-4 -10 -4 -18z" fill="#4a3b35"/>
+          <path d="M118 4 q14 4 10 22" stroke="#4a3b35" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <circle cx="88" cy="42" r="2.6" fill="#2c2a27"/><circle cx="108" cy="42" r="2.6" fill="#2c2a27"/>
+          <path d="M92 55 q7 5 14 1" stroke="#c96a55" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <circle cx="78" cy="50" r="7" fill="#f0ac8e" opacity=".45"/><circle cx="116" cy="50" r="7" fill="#f0ac8e" opacity=".45"/>
+        </g>
+
+        <!-- Nerys, postmistress & county judge -->
+        <g id="nerys">
+          <rect x="46" y="150" width="12" height="42" rx="5" fill="#2f3f5c"/>
+          <rect x="66" y="150" width="12" height="42" rx="5" fill="#2f3f5c"/>
+          <ellipse cx="49" cy="194" rx="11" ry="7" fill="#2c2a27"/>
+          <ellipse cx="76" cy="194" rx="11" ry="7" fill="#2c2a27"/>
+          <path d="M36 74 q0 -26 29 -26 q29 0 29 26 v82 q0 10 -12 10 h-34 q-12 0 -12 -10 z" fill="#35486b"/>
+          <path d="M58 48 h30 l-4 12 h-22 z" fill="#f2ead8"/>
+          <circle cx="65" cy="90" r="3" fill="#f2ead8"/><circle cx="65" cy="104" r="3" fill="#f2ead8"/>
+          <path d="M38 86 q-14 14 -18 28" stroke="#2f3f5c" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <circle cx="20" cy="116" r="6" fill="#ecc7a3"/>
+          <circle cx="97" cy="38" r="25" fill="#eec7a3"/>
+          <path d="M74 30 q0 -32 25 -32 q25 0 23 32 q-10 -12 -23 -10 q-15 0 -25 10 z" fill="#5a3f38"/>
+          <circle cx="120" cy="14" r="9" fill="#5a3f38"/>
+          <circle cx="88" cy="40" r="6.5" fill="none" stroke="#2c2a27" stroke-width="2.5"/>
+          <circle cx="108" cy="40" r="6.5" fill="none" stroke="#2c2a27" stroke-width="2.5"/>
+          <path d="M94 40 h8" stroke="#2c2a27" stroke-width="2.5"/>
+          <circle cx="88" cy="40" r="2.2" fill="#2c2a27"/><circle cx="108" cy="40" r="2.2" fill="#2c2a27"/>
+          <path d="M92 53 q7 5 14 0" stroke="#c96a55" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        </g>
+
+        <!-- clipboard -->
+        <g id="clipboard">
+          <rect x="-20" y="-30" width="40" height="54" rx="4" fill="#a9803f"/>
+          <rect x="-16" y="-24" width="32" height="42" rx="2" fill="#fffdf6"/>
+          <path d="M-10 -16 h20 M-10 -8 h20 M-10 0 h14" stroke="#8b8478" stroke-width="2.5"/>
+          <rect x="-8" y="-34" width="16" height="8" rx="3" fill="#5b6670"/>
+        </g>
+      </defs>
+    </svg>
+
+    <!-- ================= TITLE CARD ================= -->
+    <section class="panel" id="p-title">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <rect width="1600" height="900" fill="#a9d7e8"/>
+        <circle cx="1120" cy="300" r="110" fill="#ffe9a8"/>
+        <path d="M0 640 Q400 480 800 660 T1600 600 V900 H0 z" fill="#67a568"/>
+        <path d="M0 740 Q500 620 1000 780 Q1300 850 1600 790 V900 H0 z" fill="#3f6a45"/>
+        <g class="swayBunt" transform="translate(240,90)"><use href="#bunting" transform="scale(1.5)"/></g>
+        <text class="t-main rise" x="800" y="380" font-size="200" text-anchor="middle">TADCU</text>
+        <text class="t-main rise" style="--d:.9s; fill:#2c2a27" x="800" y="470" font-size="44" text-anchor="middle">in  “The Fair”</text>
+        <text class="t-main pop" style="--d:2.1s; fill:#fff3d6" x="800" y="560" font-size="40" text-anchor="middle">Y Sioe!</text>
+      </svg>
+      <div class="bubble" style="--d:.5s; left:39%; top:8%; max-width:24%;">
+        Ep. 5 · production run “test05” · Cwm Twp production unit
+      </div>
+    </section>
+
+    <!-- ============ SCENE 1 : THE QUEUE ============ -->
+    <section class="panel" id="p-s1">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <rect width="1600" height="900" fill="#a9d7e8"/>
+        <circle cx="1400" cy="140" r="70" fill="#ffdf8e"/>
+        <path d="M0 620 Q800 500 1600 600 V900 H0 z" fill="#67a568"/>
+        <path d="M0 730 Q800 660 1600 710 V900 H0 z" fill="#3f6a45"/>
+        <path d="M0 830 Q800 790 1600 820 V900 H0 z" fill="#35543a"/>
+        <!-- bunting across the top -->
+        <g class="swayBunt" transform="translate(100,40)"><use href="#bunting" transform="scale(1.4)"/></g>
+        <!-- ticket stall -->
+        <g transform="translate(640,420)">
+          <use href="#stall"/>
+          <rect x="40" y="-58" width="160" height="56" rx="6" fill="#5b6670"/>
+          <text x="120" y="-20" font-size="30" font-weight="700" fill="#f7e9d7" text-anchor="middle" font-family="Comic Sans MS, cursive">SIOE SIR</text>
+        </g>
+        <!-- the queue (file right to left) -->
+        <g transform="translate(1180,560) scale(1.1)"><g class="bob" style="animation:none"><use href="#tadcu"/></g></g>
+        <g transform="translate(1090,618)"><use href="#bryn"/><use href="#bryn-head"/><use class="wag" href="#bryn-tail"/></g>
+        <g transform="translate(760,600) scale(.9)"><g class="bob b" style="animation:none"><use href="#sheep-shape"/></g></g>
+        <g transform="translate(650,640) scale(.9)"><g class="bob c" style="animation:none"><use href="#sheep-dott"/></g></g>
+        <g transform="translate(560,615) scale(.92)"><g class="bob d" style="animation:none"><use href="#sheep-shape"/></g></g>
+        <g transform="translate(470,650) scale(.9)"><g class="bob" style="animation:none"><use href="#sheep-shape"/></g></g>
+      </svg>
+      <div class="bubble" style="--d:.8s; --dur:3.8s; left:8%; top:8%;"><b>Narrator</b>&nbsp;Cwm  Twp shows up for the county show exactly as it shows up for weather: late, in layers, all of it.</div>
+      <div class="bubble" style="--d:5s; --dur:3.8s; left:52%; top:30%;"><b>Tadcu</b>&nbsp;Tickets, Bryn. Count the girls. Don’t count Dott — she came as COMPETITION.</div>
+      <div class="bubble" style="--d:9.2s; --dur:2.6s; left:10%; top:40%;"><b>Narrator</b>&nbsp;The queue moved at the speed of civic pie.</div>
+      <div class="bubble" style="--d:11.6s; --dur:2.4s; left:62%; top:56%;"><b>Bryn</b>&nbsp;<i>(ticket in mouth. professional.)</i></div>
+    </section>
+
+    <!-- ============ SCENE 2 : THE RING ============ -->
+    <section class="panel" id="p-s2">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <rect width="1600" height="900" fill="#a9d7e8"/>
+        <circle cx="300" cy="150" r="70" fill="#ffdf8e"/>
+        <path d="M0 640 Q800 520 1600 620 V900 H0 z" fill="#67a568"/>
+        <path d="M0 760 Q800 690 1600 740 V900 H0 z" fill="#3f6a45"/>
+        <!-- the ring -->
+        <ellipse cx="800" cy="720" rx="560" ry="120" fill="#8fb47a"/>
+        <path d="M240 720 a560 120 0 1 1 1120 0" stroke="#a9803f" stroke-width="16" fill="none"/>
+        <!-- bunting behind -->
+        <g class="swayBunt" transform="translate(120,60)"><use href="#bunting" transform="scale(1.6,1.2)"/></g>
+        <!-- Nerys, judging -->
+        <g transform="translate(660,330) scale(1.5)">
+          <g class="earPerk" style="--d:6s"><use href="#nerys"/></g>
+        </g>
+        <g transform="translate(900,470)"><g class="bob" style="animation:none"><use href="#clipboard"/></g></g>
+        <!-- Dott struts in, stops, chews, wins -->
+        <g transform="translate(560,580) scale(.95)">
+          <g class="chew" style="--d:8s">
+            <g class="strutR" style="--dur:6.5s; --d:.8s; --dx:340px">
+              <use href="#sheep-dott"/>
+            </g>
+          </g>
+        </g>
+        <!-- Tadcu at the fence -->
+        <g transform="translate(1420,600) scale(1.35)">
+          <g class="tadBob" style="animation:none"><use href="#tadcu"/></g>
+        </g>
+        <!-- Bryn chews in sympathy -->
+        <g transform="translate(240,640) scale(1.2)">
+          <g class="chew" style="--d:8.3s"><use href="#bryn"/><use href="#bryn-head"/></g>
+          <use class="wag" href="#bryn-tail"/>
+        </g>
+      </svg>
+      <div class="bubble" style="--d:.8s; --dur:3.4s; left:6%; top:8%;"><b>Narrator</b>&nbsp;Into the ring walked one extremely punctual ewe.</div>
+      <div class="bubble" style="--d:5s; --dur:3.4s; left:56%; top:10%;"><b>Nerys</b>&nbsp;Movement: good. Spots: generous. Attitude: WELSH.</div>
+      <div class="bubble" style="--d:9s; --dur:3.4s; left:12%; top:38%;"><b>Tadcu</b>&nbsp;(from the fence) That’s OUR ewe, that is. Valued at two fields and a gate.</div>
+      <div class="bubble" style="--d:12.4s; --dur:2.6s; left:56%; top:46%;"><b>Narrator</b>&nbsp;Dott stopped, mid-ring, and chewed.</div>
+    </section>
+
+    <!-- ============ SCENE 3 : THE PRIZE ============ -->
+    <section class="panel" id="p-s3">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <rect width="1600" height="900" fill="#f2d9a0"/>
+        <path d="M0 640 Q800 520 1600 620 V900 H0 z" fill="#67a568"/>
+        <path d="M0 760 Q800 690 1600 740 V900 H0 z" fill="#3f6a45"/>
+        <!-- tea stall -->
+        <g transform="translate(940,390)">
+          <use href="#stall"/>
+          <text x="120" y="-16" font-size="26" font-weight="700" fill="#a9803f" text-anchor="middle" font-family="Comic Sans MS, cursive">TEA BY DILYS</text>
+        </g>
+        <g transform="translate(1020,300) scale(1.2)"><use href="#kettle"/></g>
+        <g transform="translate(1066,282)"><circle class="curl" r="8"/><circle class="curl b" r="6"/></g>
+        <!-- Dilys at the stall (scrubs + apron: same mint hero) -->
+        <g transform="translate(1090,430) scale(1.35)">
+          <g class="earPerk" style="--d:2s"><use href="#dilys"/></g>
+        </g>
+        <!-- Dott with the rosette -->
+        <g transform="translate(300,600) scale(1.05)">
+          <g class="bob" style="animation:none"><use href="#sheep-dott"/></g>
+          <g transform="translate(40,2) scale(.85)"><use href="#rosette"/></g>
+        </g>
+        <!-- Tadcu presenting -->
+        <g transform="translate(240,330) scale(1.5)">
+          <g class="capTip"><g class="tadBob" style="animation:none"><use href="#tadcu"/></g></g>
+        </g>
+        <!-- Bryn, bandana, in the queue for sugar -->
+        <g transform="translate(600,660) scale(1.2)">
+          <g class="chew" style="--d:0s; animation:none"><use href="#bryn"/><use href="#bryn-head"/><use href="#bandana"/></g>
+          <use class="wag" href="#bryn-tail"/>
+        </g>
+      </svg>
+      <div class="bubble" style="--d:.8s; --dur:3.4s; left:6%; top:8%;"><b>Tadcu</b>&nbsp;First rosette in the family since the butters. 1989.</div>
+      <div class="bubble" style="--d:4.6s; --dur:3.2s; left:56%; top:24%;"><b>Dilys</b>&nbsp;Sugar’s free, Tadcu. Nobody can take the week away, mind.</div>
+      <div class="bubble" style="--d:8.4s; --dur:3.4s; left:14%; top:40%;"><b>Narrator</b>&nbsp;And the rosette — one red circle, scaled to ambition — went straight on the ewe.</div>
+      <div class="bubble" style="--d:12s; --dur:2.6s; left:52%; top:56%;"><b>Dott</b>&nbsp;<i>(wear it like you sued for it)</i></div>
+    </section>
+
+    <!-- ============ SCENE 4 : HOMECOMING ============ -->
+    <section class="panel" id="p-s4">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <defs><linearGradient id="dusk5" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ee9b6f"/><stop offset=".7" stop-color="#6d5a72"/><stop offset="1" stop-color="#41505a"/>
+        </linearGradient></defs>
+        <rect width="1600" height="900" fill="url(#dusk5)"/>
+        <path d="M0 520 Q500 380 1000 540 Q1320 630 1600 560 V900 H0 z" fill="#3f5a48"/>
+        <path d="M0 660 Q700 560 1600 640 V900 H0 z" fill="#31503e"/>
+        <!-- the homecoming parade, Dott leading with rosette -->
+        <g class="walkL" style="--dur:9s; --dx:-1500px">
+          <g transform="translate(1660,480) scale(1)"><use href="#sheep-dott"/></g>
+        </g>
+        <g transform="translate(1660,428) scale(.8)">
+          <g class="walkL" style="--dur:9s; --dx:-1500px"><g transform="translate(0,0)"><use href="#rosette"/></g></g>
+        </g>
+        <g class="walkL" style="--d:1.4s; --dur:9s; --dx:-1550px">
+          <g transform="translate(1740,560) scale(1.35)">
+            <g class="tadBob" style="animation:none"><use href="#tadcu"/></g>
+          </g>
+        </g>
+        <g class="walkL" style="--d:2.2s; --dur:9s; --dx:-1560px">
+          <g transform="translate(1780,610) scale(1.05)">
+            <use href="#bryn"/><use href="#bryn-head"/><use href="#bandana"/><use class="wag" href="#bryn-tail"/>
+          </g>
+        </g>
+        <!-- the girls, cheering on both banks -->
+        <g class="hopHi" transform="translate(520,560) scale(.9)"><use href="#sheep-shape"/></g>
+        <g class="hopHi b" transform="translate(700,530) scale(.9)"><use href="#sheep-shape"/></g>
+        <g class="hopHi c" transform="translate(900,570) scale(.86)"><use href="#sheep-shape"/></g>
+        <g class="hopHi" transform="translate(1130,560) scale(.9)"><use href="#sheep-dott"/></g>
+        <g class="hopHi b" transform="translate(1320,580) scale(.88)"><use href="#sheep-shape"/></g>
+      </svg>
+      <div class="bubble" style="--d:1.2s; --dur:3.6s; left:6%; top:8%;"><b>Narrator</b>&nbsp;And so, home, up the lane — where the gate waited, wide open, like a dog who knew this was coming.</div>
+      <div class="bubble" style="--d:5.4s; --dur:3.8s; left:36%; top:44%;"><b>Tadcu</b>&nbsp;Nos da, chi gyd! Rosettes for nobody: we were all there — and Dott did it PERSONALLY.</div>
+      <div class="bubble" style="--d:9.6s; --dur:3s; left:14%; top:26%;"><b>THE GIRLS</b>&nbsp;<i>(the applause, one field wide)</i></div>
+    </section>
+
+    <!-- ================= END CARD ================= -->
+    <section class="panel" id="p-end">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <rect width="1600" height="900" fill="#23281f"/>
+        <text class="t-main pop" x="800" y="360" font-size="130" text-anchor="middle">THE END</text>
+        <text class="t-main rise" style="--d:1s; fill:#8fae8f" x="800" y="150" font-size="44" text-anchor="middle">Cwm Twp production unit · test05</text>
+        <text class="t-main rise" style="--d:1.8s; fill:#cfd8cf" x="800" y="450" font-size="32" text-anchor="middle">Next episode: Tadcu invests in a latch.</text>
+        <text class="t-main rise" style="--d:2.2s; fill:#cfd8cf" x="800" y="496" font-size="32" text-anchor="middle">Bryn invests in a dream. Ymlaen!</text>
+        <g transform="translate(660,560) scale(1.4)"><g class="bob"><use href="#sheep-shape"/></g></g>
+        <g transform="translate(840,588) scale(.6)"><use href="#rosette"/></g>
+        <text class="t-main pop" style="--d:3s" x="800" y="820" font-size="40" text-anchor="middle">Nos da.</text>
+      </svg>
+    </section>
+
+    <div id="subBar"><div id="sub"></div></div>
+  </div>
+
+  <div id="ui">
+    <button id="bPlay" title="Play / pause">▶</button>
+    <button id="bRestart" title="Restart">⟲</button>
+    <div id="bar"><div id="fill"></div></div>
+    <button id="bSkip" title="Next scene">⏭</button>
+    <span id="lbl">Ready — press play</span>
+  </div>
+  <div id="hint">Keyboard: space = play/pause · → = next scene · 1–6 = jump to a scene · click the bar to scrub by scene.</div>
+</div>
+
+<script>
+/* ================= TIMELINE ================= */
+const SCENES = [
+  { id:"p-title", name:"Title", dur:5.5,
+    subs:[ {t:.8, who:"Tadcu", x:"Show day! Best hat, best dog, and one ewe with a career."} ] },
+  { id:"p-s1", name:"The Queue", dur:14,
+    subs:[
+      {t:.6,  who:"Narrator", x:"Cwm Twp shows up for the county show exactly as it shows up for weather: late, in layers, all of it."},
+      {t:4.6, who:"Tadcu",   x:"Tickets, Bryn. Count the girls. Don’t count Dott — she came as COMPETITION."},
+      {t:9.2, who:"Narrator", x:"The queue moved at the speed of civic pie."},
+      {t:11.6,who:"Bryn",    x:"(ticket in mouth. professional.)"} ] },
+  { id:"p-s2", name:"The Ring", dur:15,
+    subs:[
+      {t:.8,  who:"Narrator", x:"Into the ring walked one extremely punctual ewe."},
+      {t:5,   who:"Nerys",   x:"Movement: good. Spots: generous. Attitude: WELSH."},
+      {t:9,   who:"Tadcu",   x:"(from the fence) That’s OUR ewe, that is. Valued at two fields and a gate."},
+      {t:12.4,who:"Narrator", x:"Dott stopped, mid-ring, and chewed."} ] },
+  { id:"p-s3", name:"The Prize", dur:13,
+    subs:[
+      {t:.8,  who:"Tadcu",   x:"First rosette in the family since the butters. 1989."},
+      {t:4.6, who:"Dilys",   x:"Sugar’s free, Tadcu. Nobody can take the week away, mind."},
+      {t:8.4, who:"Narrator", x:"And the rosette — one red circle, scaled to ambition — went straight on the ewe."},
+      {t:12,  who:"Dott",    x:"(wear it like you sued for it)"} ] },
+  { id:"p-s4", name:"The Homecoming", dur:14,
+    subs:[
+      {t:1.2, who:"Narrator", x:"And so, home, up the lane — where the gate waited, wide open, like a dog who knew this was coming."},
+      {t:5.4, who:"Tadcu",   x:"Nos da, chi gyd! Rosettes for nobody: we were all there — and Dott did it PERSONALLY."},
+      {t:9.6, who:"THE GIRLS", x:"(the applause, one field wide)"} ] },
+  { id:"p-end", name:"The End", dur:6,
+    subs:[ {t:2.2, who:"", x:"Nos da."} ] },
+];
+const TOTAL = SCENES.reduce((a,s)=>a+s.dur,0);
+const STARTS = []; SCENES.reduce((a,s)=>{ STARTS.push(a); return a+s.dur; },0);
+
+let idx=0, tOff=0, playing=false, lastTs=0, lastSub=-99;
+const stage=document.getElementById('stage'),
+      panels=[...document.querySelectorAll('.panel')],
+      sub=document.getElementById('sub'),
+      fill=document.getElementById('fill'),
+      lbl=document.getElementById('lbl'),
+      bPlay=document.getElementById('bPlay');
+
+let actx=null;
+function bloop(f0,f1,dur,type,gain){
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain(), n=actx.currentTime;
+    o.type=type||"sine";
+    o.frequency.setValueAtTime(f0,n);
+    o.frequency.exponentialRampToValueAtTime(Math.max(40,f1),n+dur);
+    g.gain.setValueAtTime(gain||.05,n);
+    g.gain.exponentialRampToValueAtTime(.0001,n+dur);
+    o.connect(g); g.connect(actx.destination); o.start(n); o.stop(n+dur+.02);
+  }catch(e){}
+}
+const MUTE=false;
+
+function startScene(i, silent){
+  panels.forEach(p=>p.classList.remove('active'));
+  const p=panels[i];
+  void p.offsetWidth;
+  p.classList.add('active');
+  idx=i; tOff=0; lastSub=-99;
+  sub.textContent='';
+  lbl.textContent=`Scene ${i+1}/${SCENES.length} — ${SCENES[i].name}`;
+  if(!MUTE){ bloop(220,330,.14,"triangle",.05); setTimeout(()=>bloop(330,440,.14,"triangle",.05),150); }
+}
+
+function updateSub(off){
+  const s=SCENES[idx]; let best=null,bi=-1;
+  s.subs.forEach((l,i)=>{ if(off>=l.t){ best=l; bi=i; } });
+  if(bi===lastSub) return;
+  lastSub=bi;
+  if(best){
+    sub.innerHTML = best.who ? `<span class="who">${best.who}</span>${esc(best.x)}` : esc(best.x);
+    bloop(500,760,.09,"square",.025);
+  } else sub.textContent='';
+}
+function esc(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+function setFill(){
+  const start=idx===0?0:STARTS[idx];
+  fill.style.width=(Math.min(100,(start+tOff)/TOTAL*100)).toFixed(2)+'%';
+}
+
+function tick(ts){
+  if(playing){
+    const dt=Math.min(.05,(ts-lastTs)/1000); lastTs=ts; tOff+=dt;
+    if(tOff>=SCENES[idx].dur){
+      if(idx<SCENES.length-1) startScene(idx+1,false);
+      else { playing=false; bPlay.textContent='▶'; tOff=SCENES[idx].dur; setFill();
+        lbl.textContent='Finished — press play to watch again'; return; }
+    }
+    updateSub(tOff); setFill();
+  }
+  requestAnimationFrame(tick);
+}
+
+function play(){
+  if(playing){ stage.classList.add('paused'); playing=false; bPlay.textContent='▶'; return; }
+  stage.classList.remove('paused'); playing=true; bPlay.textContent='⏸';
+  lastTs=performance.now();
+  if(lbl.textContent.startsWith('Finished')) startScene(0,true);
+  bloop(440,660,.12,"triangle",.04);
+}
+function restart(){ startScene(0,true); stage.classList.remove('paused'); playing=true; bPlay.textContent='⏸'; lastTs=performance.now(); }
+
+bPlay.onclick=play;
+document.getElementById('bRestart').onclick=restart;
+document.getElementById('bSkip').onclick=()=>startScene((idx+1)%SCENES.length,false);
+document.getElementById('bar').onclick=e=>{
+  const r=e.currentTarget.getBoundingClientRect();
+  const pos=(e.clientX-r.left)/r.width*TOTAL;
+  let i=SCENES.length-1; for(let k=0;k<SCENES.length;k++){ if(STARTS[k]<=pos) i=k; }
+  startScene(i,false);
+};
+window.addEventListener('keydown',e=>{
+  if(e.code==='Space'){ e.preventDefault(); play(); }
+  else if(e.key==='ArrowRight') startScene((idx+1)%SCENES.length,false);
+  else if(/^[1-9]$/.test(e.key)) startScene(+e.key-1,false);
+});
+
+panels[0].classList.add('active');
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
