@@ -1,6 +1,6 @@
 # Tadcu — Episode 5: "The Fair"
 
-*Series: Tadcu · Episode 5 · Production: test05*
+*Series: Tadcu · Episode 5 · Production: episode05*
 
 ---
 

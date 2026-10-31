@@ -43,4 +43,4 @@ homecoming is loud.
 
 Same flat 2-D vector series language (HTML + CSS + SVG, no assets).
 Runtime ~75 seconds across 6 panels. © 2026 — Tadcu series. Production run
-`test05` of the Cwm Dwl production unit.
+`episode05` of the Cwm Dwl production unit.
