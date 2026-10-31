@@ -20,7 +20,7 @@ scene.
 
 ## Story so far
 
-Episodes 1–4 live in `../test01`–`../test04`. Episode 4's end card made a
+Episodes 1–4 live in `../episode01`–`../episode04`. Episode 4's end card made a
 promise: **"Cwm Dwl goes to the show — and Dott enters herself."** This one
 keeps it.
 
