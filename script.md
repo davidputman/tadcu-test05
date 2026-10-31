@@ -21,7 +21,7 @@ Two stalls, one banner (SIOE SIR — hand-painted, an A upside down), one
 queue. Tadcu, Bryn, and — increíble — four ewes, standing in line like
 members.
 
-- **NARRATOR:** "Cwm Twp shows up for the county show exactly as it shows up
+- **NARRATOR:** "Cwm Dwl shows up for the county show exactly as it shows up
   for weather: late, in layers, all of it."
 - **TADCU:** "Tickets, Bryn. Count the girls. Don't count Dott — she came
   as COMPETITION."

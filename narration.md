@@ -21,7 +21,7 @@ each beat for the editor only. **BOLD = narrator, to be recorded.**
 ### ⏱ 0:05.5 — THE QUEUE (scene 2)
 
 **0:06.1**
-> **Cwm Twp shows up for the county show exactly as it shows up for
+> **Cwm Dwl shows up for the county show exactly as it shows up for
 > weather: late, in layers, all of it.**
 
 *(Tadcu's ticket briefing. Bryn's ticket in mouth.)*
@@ -74,14 +74,14 @@ each beat for the editor only. **BOLD = narrator, to be recorded.**
 field.)*
 
 **0:56.5**
-> **Cwm Twp one, everyone zero. Wednesday restates nothing.**
+> **Cwm Dwl one, everyone zero. Wednesday restates nothing.**
 
 ---
 
 ### ⏱ 1:01.5 — END CARD (scene 6)
 
 **1:03.7**
-> **Nos da, Cwm Twp. Sleep well, champions — the show owes nobody
+> **Nos da, Cwm Dwl. Sleep well, champions — the show owes nobody
 > nothing.**
 
 *MUSIC OUT.*

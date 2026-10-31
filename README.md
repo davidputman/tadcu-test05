@@ -21,7 +21,7 @@ scene.
 ## Story so far
 
 Episodes 1–4 live in `../test01`–`../test04`. Episode 4's end card made a
-promise: **"Cwm Twp goes to the show — and Dott enters herself."** This one
+promise: **"Cwm Dwl goes to the show — and Dott enters herself."** This one
 keeps it.
 
 ## Episode 5 summary
@@ -43,4 +43,4 @@ homecoming is loud.
 
 Same flat 2-D vector series language (HTML + CSS + SVG, no assets).
 Runtime ~75 seconds across 6 panels. © 2026 — Tadcu series. Production run
-`test05` of the Cwm Twp production unit.
+`test05` of the Cwm Dwl production unit.
